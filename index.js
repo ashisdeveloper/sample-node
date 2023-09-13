@@ -1,11 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 
+const PORT = 8021;
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
-const PORT = 8021;
+app.use(express.static("uploads"));
 
 app.listen(PORT, (error) => {
 	if (!error) console.log("Server is listening on port " + PORT);
