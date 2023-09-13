@@ -24,7 +24,7 @@ app.get("/ocr-pdf", async (req, res) => {
 	if (!fs.existsSync("./uploads")) {
 		fs.mkdirSync("./uploads");
 	}
-	let link = (req.url || '').replace(/\s+/gi, '%20')
+	let link = (req.query.url || '').replace(/\s+/gi, '%20')
 
 	const { stdout, stderr } = await exec(`wget -P ./uploads ${link}`);
 	console.log('stdout:', stdout);
