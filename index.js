@@ -1,5 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const util = require('util');
+const fs = require('fs');
+const exec = util.promisify(require('child_process').exec);
 
 const PORT = 8021;
 const app = express();
@@ -15,4 +18,18 @@ app.listen(PORT, (error) => {
 app.get("/", async (req, res) => {
 	res.status(200);
 	res.send("Welcome to root URL of Server");
+});
+
+app.get("/ocr-pdf", async (req, res) => {
+	if (!fs.existsSync("./uploads")) {
+		fs.mkdirSync("./uploads");
+	}
+	let link = (req.url || '').replace(/\s+/gi, '%20')
+
+	const { stdout, stderr } = await exec(`wget -P ./uploads ${link}`);
+	console.log('stdout:', stdout);
+	console.log('stderr:', stderr);
+
+	res.status(200);
+	res.send("Done-" + new Date().getTime());
 });

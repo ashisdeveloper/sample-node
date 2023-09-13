@@ -112,6 +112,8 @@ public/doc-imgs/
 public/dms/
 public/voices/
 
+uploads/
+
 *swagger.json
 *package-lock.json
 *test.js
