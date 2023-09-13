@@ -60,9 +60,9 @@ app.get("/ocr-pdf", async (req, res) => {
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			await exec(`ocrmypdf ./uploads/${outputFile} ./uploads/${outputFile.replace(/\.pdf/gi, '-output.pdf')}`);
+			await exec(`ocrmypdf ./uploads/${outputFile} ./uploads/${outputFile}}`);
 
-			res.status(200).json({ isSuccessful: true, file: outputFile.replace(/\.pdf/gi, '-output.pdf') })
+			res.status(200).json({ isSuccessful: true, file: outputFile })
 		} catch (error) {
 			console.log(error)
 			res.status(200).json({ isSuccessful: false, file: '' })
