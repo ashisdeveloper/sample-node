@@ -29,11 +29,11 @@ const fileName = (url) => {
 	return fileName
 }
 
-const delFile = async () => {
+const delFile = async (file) => {
 	let res = false
-	if (fs.existsSync('./uploads/' + file)) {
+	if (fs.existsSync(file)) {
 		res = await new Promise((resolve, reject) => {
-			fs.unlink('./uploads/' + file, function () {
+			fs.unlink(file, function () {
 				resolve(true);
 			});
 		});
