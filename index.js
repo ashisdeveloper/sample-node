@@ -20,16 +20,56 @@ app.get("/", async (req, res) => {
 	res.send("Welcome to root URL of Server");
 });
 
+const fileName = (url) => {
+	let arr = url.split('/')
+	let fileName = ''
+	if (arr.length > 0) {
+		fileName = arr[arr.length - 1]
+	}
+	return fileName
+}
+
+const delFile = async () => {
+	let res = false
+	if (fs.existsSync('./uploads/' + file)) {
+		res = await new Promise((resolve, reject) => {
+			fs.unlink('./uploads/' + file, function () {
+				resolve(true);
+			});
+		});
+	}
+	return res
+}
+
 app.get("/ocr-pdf", async (req, res) => {
 	if (!fs.existsSync("./uploads")) {
 		fs.mkdirSync("./uploads");
 	}
-	let link = (req.query.url || '').replace(/\s+/gi, '%20')
+	req.query.url = req.query.url || ''
+	let link = req.query.url.replace(/\s+/gi, '%20')
 
-	const { stdout, stderr } = await exec(`wget -P ./uploads ${link}`);
-	console.log('stdout:', stdout);
-	console.log('stderr:', stderr);
+	let file = fileName(req.query.url)
 
-	res.status(200);
-	res.send("Done-" + new Date().getTime());
+	if (file && file.includes('.')) {
+
+		try {
+			await delFile('./uploads/' + file)
+			await delFile('./uploads/' + file.replace(/\.pdf/gi, '-output.pdf'))
+
+			const { stdout, stderr } = await exec(`wget -P ./uploads ${link}`);
+			/* console.log('stdout:', stdout);
+			console.log('stderr:', stderr); */
+
+			if (fs.existsSync('./uploads/' + file)) {
+				await exec(`ocrmypdf ${file} ${file.replace(/\.pdf/gi, '-output.pdf')}`);
+			}
+			res.status(200).json({ isSuccessful: true, file: file.replace(/\.pdf/gi, '-output.pdf') })
+		} catch (error) {
+			console.log(error)
+			res.status(200).json({ isSuccessful: false, file: '' })
+		}
+
+	} else {
+		res.status(200).json({ isSuccessful: false, file: '' })
+	}
 });
