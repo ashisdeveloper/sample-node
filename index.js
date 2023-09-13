@@ -55,12 +55,14 @@ app.get("/ocr-pdf", async (req, res) => {
 		try {
 			// await delFile('./uploads/' + file)
 			// await delFile('./uploads/' + file.replace(/\.pdf/gi, '-output.pdf'))
-			const outputFile = `ocr ${new Date().getTime()}.pdf`
-			const { stdout, stderr } = await exec(`wget -P ./uploads/${outputFile} ${link}`);
+			const outputFile = `${new Date().getTime()}.pdf`
+			const { stdout, stderr } = await exec(`cd uploads
+			wget -P ${outputFile} ${link}`);
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			await exec(`ocrmypdf ./uploads/${outputFile} ./uploads/${outputFile}}`);
+			await exec(`cd uploads
+			ocrmypdf ${outputFile} ${outputFile}}`);
 
 			res.status(200).json({ isSuccessful: true, file: outputFile })
 		} catch (error) {
