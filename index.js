@@ -61,7 +61,7 @@ app.get("/ocr-pdf", async (req, res) => {
 			console.log('stderr:', stderr); */
 
 			if (fs.existsSync('./uploads/' + file)) {
-				await exec(`ocrmypdf ${file} ${file.replace(/\.pdf/gi, '-output.pdf')}`);
+				await exec(`ocrmypdf "${file}" "${file.replace(/\.pdf/gi, '-output.pdf')}"`);
 			}
 			res.status(200).json({ isSuccessful: true, file: file.replace(/\.pdf/gi, '-output.pdf') })
 		} catch (error) {
