@@ -53,17 +53,16 @@ app.get("/ocr-pdf", async (req, res) => {
 	if (file && file.includes('.')) {
 
 		try {
-			await delFile('./uploads/' + file)
-			await delFile('./uploads/' + file.replace(/\.pdf/gi, '-output.pdf'))
-
-			const { stdout, stderr } = await exec(`wget -P ./uploads ${link}`);
+			// await delFile('./uploads/' + file)
+			// await delFile('./uploads/' + file.replace(/\.pdf/gi, '-output.pdf'))
+			const outputFile = `${new Date().getTime()}.pdf`
+			const { stdout, stderr } = await exec(`wget -P ./uploads/${outputFile} ${link}`);
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			if (fs.existsSync('./uploads/' + file)) {
-				await exec(`ocrmypdf "${file}" "${file.replace(/\.pdf/gi, '-output.pdf')}"`);
-			}
-			res.status(200).json({ isSuccessful: true, file: file.replace(/\.pdf/gi, '-output.pdf') })
+			await exec(`ocrmypdf "${outputFile}" "${outputFile.replace(/\.pdf/gi, '-output.pdf')}"`);
+
+			res.status(200).json({ isSuccessful: true, file: outputFile.replace(/\.pdf/gi, '-output.pdf') })
 		} catch (error) {
 			console.log(error)
 			res.status(200).json({ isSuccessful: false, file: '' })
