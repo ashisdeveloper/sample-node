@@ -55,7 +55,7 @@ app.get("/ocr-pdf", async (req, res) => {
 		try {
 			// await delFile('./uploads/' + file)
 			// await delFile('./uploads/' + file.replace(/\.pdf/gi, '-output.pdf'))
-			const outputFile = `ocr-${new Date().getTime()}.pdf`
+			const outputFile = `ocr ${new Date().getTime()}.pdf`
 			const { stdout, stderr } = await exec(`wget -P ./uploads/${outputFile} ${link}`);
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
