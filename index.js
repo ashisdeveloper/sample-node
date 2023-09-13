@@ -15,10 +15,10 @@ app.listen(PORT, (error) => {
 	else console.log("Error occurred, server can't start", error);
 });
 
-app.get("/", async (req, res) => {
+/* app.get("/", async (req, res) => {
 	res.status(200);
 	res.send("Welcome to root URL of Server");
-});
+}); */
 
 const fileName = (url) => {
 	let arr = url.split('/')
