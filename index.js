@@ -41,26 +41,31 @@ const delFile = async (file) => {
 	return res
 }
 
+// http://localhost:8021/ocr-pdf?rotate=1&background=1&deskew=1&clean=1&url=https://transfer.sh/DFGmlvglle/Public%20WaterMassMailing-1.pdf
 app.get("/ocr-pdf", async (req, res) => {
 	if (!fs.existsSync("./uploads")) {
 		fs.mkdirSync("./uploads");
 	}
 	req.query.url = req.query.url || ''
 	let link = req.query.url.replace(/\s+/gi, '%20')
+	let params = []
+
+	if (Number(req.query?.rotate) === 1) params.push('--rotate-pages')
+	if (Number(req.query?.background) === 1) params.push('--remove-background')
+	if (Number(req.query?.deskew) === 1) params.push('--deskew')
+	if (Number(req.query?.clean) === 1) params.push('--clean --clean-final')
 
 	let file = fileName(req.query.url)
 
 	if (file && file.includes('.')) {
 
 		try {
-			// await delFile('./uploads/' + file)
-			// await delFile('./uploads/' + file.replace(/\.pdf/gi, '-output.pdf'))
 			const outputFile = `${new Date().getTime()}.pdf`
 			const { stdout, stderr } = await exec(`wget -O ./uploads/${outputFile} ${link}`);
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			await exec(`ocrmypdf --rotate-pages --remove-background --deskew --clean --clean-final './uploads/${outputFile}' './uploads/${outputFile}'`);
+			await exec(`ocrmypdf ${params.join(' ')} './uploads/${outputFile}' './uploads/${outputFile}'`);
 
 			res.status(200).json({ isSuccessful: true, file: outputFile })
 		} catch (error) {
