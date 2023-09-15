@@ -42,6 +42,37 @@ const delFile = async (file) => {
 	return res
 }
 
+const fileExt = (url) => {
+	let result = ''
+	if (url === null) {
+		result = "";
+	}
+	var index = url.lastIndexOf("/");
+	if (index !== -1) {
+		url = url.substring(index + 1); // Keep path without its segments
+	}
+	index = url.indexOf("?");
+	if (index !== -1) {
+		url = url.substring(0, index); // Remove query
+	}
+	index = url.indexOf("#");
+	if (index !== -1) {
+		url = url.substring(0, index); // Remove fragment
+	}
+	index = url.lastIndexOf(".");
+	result = index !== -1
+		? url.substring(index + 1) // Only keep file extension
+		: ""; // No extension found
+	result = result.toLowerCase()
+	if (![
+		'pdf',
+		'jpg', 'jpeg', 'png', 'bmp', 'gif', 'ico', 'webp', 'jfif'
+	].includes(result)) {
+		result = ''
+	}
+	return result
+};
+
 // http://localhost:8021/ocr-pdf?rotate=1&background=1&deskew=1&clean=1&url=https://transfer.sh/DFGmlvglle/Public%20WaterMassMailing-1.pdf
 app.get("/ocr-pdf", async (req, res) => {
 	if (!fs.existsSync("./uploads")) {
@@ -57,20 +88,34 @@ app.get("/ocr-pdf", async (req, res) => {
 	if (Number(req.query?.clean) === 1) params.push('--clean --clean-final')
 
 	let file = fileName(req.query.url)
+	const fileExt = fileExt(file)
 
-	if (file && file.includes('.')) {
+	if (fileExt && file.includes('.')) {
 
 		console.log('LINK: ', link)
 
 		try {
-			const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
-			const { stdout, stderr } = await exec(`wget -O ./uploads/${outputFile} ${link}`);
-			/* console.log('stdout:', stdout);
-			console.log('stderr:', stderr); */
+			if (fileExt === 'pdf') {
+				const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
+				const { stdout, stderr } = await exec(`wget -O ./uploads/${outputFile} ${link}`);
+				/* console.log('stdout:', stdout);
+				console.log('stderr:', stderr); */
 
-			await exec(`ocrmypdf ${params.join(' ')} --skip-text --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
+				await exec(`ocrmypdf ${params.join(' ')} --skip-text --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
 
-			res.status(200).json({ isSuccessful: true, file: outputFile })
+				res.status(200).json({ isSuccessful: true, file: outputFile })
+			} else {
+				const fileWithoutExt = `ocr-${new Date().getTime()}-${uuidv4()}`
+				const imgFile = `${fileWithoutExt}.${fileExt}`
+				const outputFile = `${fileWithoutExt}.pdf`
+				const { stdout, stderr } = await exec(`wget -O ./uploads/${imgFile} ${link}`);
+				/* console.log('stdout:', stdout);
+				console.log('stderr:', stderr); */
+
+				await exec(`ocrmypdf ${params.join(' ')} --skip-text --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
+
+				res.status(200).json({ isSuccessful: true, file: outputFile })
+			}
 		} catch (error) {
 			console.log(error)
 			res.status(200).json({ isSuccessful: false, file: '' })
