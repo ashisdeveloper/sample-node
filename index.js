@@ -66,7 +66,7 @@ app.get("/ocr-pdf", async (req, res) => {
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			await exec(`ocrmypdf --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' ${params.join(' ')} './uploads/${outputFile}' './uploads/${outputFile}'`);
+			await exec(`ocrmypdf ${params.join(' ')} --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
 
 			res.status(200).json({ isSuccessful: true, file: outputFile })
 		} catch (error) {
