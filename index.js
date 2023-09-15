@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const util = require('util');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
 const exec = util.promisify(require('child_process').exec);
 
 const PORT = 8021;
@@ -60,12 +61,12 @@ app.get("/ocr-pdf", async (req, res) => {
 	if (file && file.includes('.')) {
 
 		try {
-			const outputFile = `${new Date().getTime()}.pdf`
+			const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
 			const { stdout, stderr } = await exec(`wget -O ./uploads/${outputFile} ${link}`);
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			await exec(`ocrmypdf ${params.join(' ')} './uploads/${outputFile}' './uploads/${outputFile}'`);
+			await exec(`ocrmypdf --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}'output.txt ${params.join(' ')} './uploads/${outputFile}' './uploads/${outputFile}'`);
 
 			res.status(200).json({ isSuccessful: true, file: outputFile })
 		} catch (error) {
