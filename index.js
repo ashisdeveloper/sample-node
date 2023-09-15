@@ -116,7 +116,7 @@ app.get("/ocr-pdf", async (req, res) => {
 
 				if (fileExtension === 'png') {
 					let buffer = fs.readFileSync(`./uploads/${imgFile}`);
-					pngToJpeg({ quality: 100 })(buffer)
+					await pngToJpeg({ quality: 100 })(buffer)
 						.then(async output => {
 							let oldFile = `./uploads/${imgFile}`
 							imgFile = `${fileWithoutExt}.jpeg`
