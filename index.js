@@ -107,7 +107,7 @@ app.get("/ocr-pdf", async (req, res) => {
 				res.status(200).json({ isSuccessful: true, file: outputFile })
 			} else {
 				const fileWithoutExt = `ocr-${new Date().getTime()}-${uuidv4()}`
-				const imgFile = `${fileWithoutExt}.${fileExtension}`
+				let imgFile = `${fileWithoutExt}.${fileExtension}`
 				const outputFile = `${fileWithoutExt}.pdf`
 				const outputTxtFile = `${fileWithoutExt}.txt`
 				const { stdout, stderr } = await exec(`wget -O ./uploads/${imgFile} ${link}`);
