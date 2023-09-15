@@ -3,7 +3,7 @@ const cors = require("cors");
 const util = require('util');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const pngToJpeg = require('png-to-jpeg');
+const sharp = require('sharp');
 const exec = util.promisify(require('child_process').exec);
 
 const PORT = 8021;
@@ -115,7 +115,8 @@ app.get("/ocr-pdf", async (req, res) => {
 				console.log('stderr:', stderr); */
 
 				if (fileExtension === 'png') {
-					let buffer = fs.readFileSync(`./uploads/${imgFile}`);
+					sharp(`./uploads/${imgFile}`).flatten({ background: { r: 255, g: 255, b: 255 } })
+					/* let buffer = fs.readFileSync(`./uploads/${imgFile}`);
 					await pngToJpeg({ quality: 100 })(buffer)
 						.then(async output => {
 							let oldFile = `./uploads/${imgFile}`
@@ -123,7 +124,7 @@ app.get("/ocr-pdf", async (req, res) => {
 							fs.writeFileSync(`./uploads/${imgFile}`, output)
 							await delFile(oldFile)
 							console.log(imgFile)
-						});
+						}); */
 				}
 
 				await exec(`ocrmypdf --image-dpi 300 ${params.join(' ')} --skip-text --sidecar './uploads/${outputTxtFile}' './uploads/${imgFile}' './uploads/${outputFile}'`);
