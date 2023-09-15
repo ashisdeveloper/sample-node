@@ -122,6 +122,7 @@ app.get("/ocr-pdf", async (req, res) => {
 							imgFile = `${fileWithoutExt}.jpeg`
 							fs.writeFileSync(`./uploads/${imgFile}`, output)
 							await delFile(oldFile)
+							console.log(imgFile)
 						});
 				}
 
