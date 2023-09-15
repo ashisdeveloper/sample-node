@@ -88,14 +88,14 @@ app.get("/ocr-pdf", async (req, res) => {
 	if (Number(req.query?.clean) === 1) params.push('--clean --clean-final')
 
 	let file = fileName(req.query.url)
-	const fileExt = fileExt(file)
+	const fileExtension = fileExt(file)
 
-	if (fileExt && file.includes('.')) {
+	if (fileExtension && file.includes('.')) {
 
 		console.log('LINK: ', link)
 
 		try {
-			if (fileExt === 'pdf') {
+			if (fileExtension === 'pdf') {
 				const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
 				const { stdout, stderr } = await exec(`wget -O ./uploads/${outputFile} ${link}`);
 				/* console.log('stdout:', stdout);
@@ -106,7 +106,7 @@ app.get("/ocr-pdf", async (req, res) => {
 				res.status(200).json({ isSuccessful: true, file: outputFile })
 			} else {
 				const fileWithoutExt = `ocr-${new Date().getTime()}-${uuidv4()}`
-				const imgFile = `${fileWithoutExt}.${fileExt}`
+				const imgFile = `${fileWithoutExt}.${fileExtension}`
 				const outputFile = `${fileWithoutExt}.pdf`
 				const { stdout, stderr } = await exec(`wget -O ./uploads/${imgFile} ${link}`);
 				/* console.log('stdout:', stdout);
