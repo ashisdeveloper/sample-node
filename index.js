@@ -115,7 +115,7 @@ app.get("/ocr-pdf", async (req, res) => {
 				console.log('stderr:', stderr); */
 
 				if (fileExtension === 'png') {
-					sharp(`./uploads/${imgFile}`).flatten({ background: { r: 255, g: 255, b: 255 } })
+					sharp(`./uploads/${imgFile}`).flatten({ background: { r: 255, g: 0, b: 0 } })
 					/* let buffer = fs.readFileSync(`./uploads/${imgFile}`);
 					await pngToJpeg({ quality: 100 })(buffer)
 						.then(async output => {
