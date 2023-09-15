@@ -108,11 +108,12 @@ app.get("/ocr-pdf", async (req, res) => {
 				const fileWithoutExt = `ocr-${new Date().getTime()}-${uuidv4()}`
 				const imgFile = `${fileWithoutExt}.${fileExtension}`
 				const outputFile = `${fileWithoutExt}.pdf`
+				const outputTxtFile = `${fileWithoutExt}.txt`
 				const { stdout, stderr } = await exec(`wget -O ./uploads/${imgFile} ${link}`);
 				/* console.log('stdout:', stdout);
 				console.log('stderr:', stderr); */
 
-				await exec(`ocrmypdf ${params.join(' ')} --skip-text --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
+				await exec(`ocrmypdf ${params.join(' ')} --skip-text --sidecar './uploads/${outputTxtFile}' './uploads/${imgFile}' './uploads/${outputFile}'`);
 
 				res.status(200).json({ isSuccessful: true, file: outputFile })
 			}
