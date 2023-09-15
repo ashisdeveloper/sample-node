@@ -60,6 +60,8 @@ app.get("/ocr-pdf", async (req, res) => {
 
 	if (file && file.includes('.')) {
 
+		console.log('LINK: ', link)
+
 		try {
 			const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
 			const { stdout, stderr } = await exec(`wget -O ./uploads/${outputFile} ${link}`);
