@@ -102,7 +102,7 @@ app.get("/ocr-pdf", async (req, res) => {
 				/* console.log('stdout:', stdout);
 				console.log('stderr:', stderr); */
 
-				await exec(`ocrmypdf ${params.join(' ')} --skip-text --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
+				await exec(`ocrmypdf ${params.join(' ')} --skip-text --output-type pdfa --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
 
 				res.status(200).json({ isSuccessful: true, file: outputFile })
 			} else {
@@ -114,20 +114,9 @@ app.get("/ocr-pdf", async (req, res) => {
 				/* console.log('stdout:', stdout);
 				console.log('stderr:', stderr); */
 
-				if (fileExtension === 'png') {
-					sharp(`./uploads/${imgFile}`).flatten({ background: { r: 255, g: 0, b: 0 } })
-					/* let buffer = fs.readFileSync(`./uploads/${imgFile}`);
-					await pngToJpeg({ quality: 100 })(buffer)
-						.then(async output => {
-							let oldFile = `./uploads/${imgFile}`
-							imgFile = `${fileWithoutExt}.jpeg`
-							fs.writeFileSync(`./uploads/${imgFile}`, output)
-							await delFile(oldFile)
-							console.log(imgFile)
-						}); */
-				}
+				if (fileExtension === 'png') sharp(`./uploads/${imgFile}`).flatten({ background: '#fff' })
 
-				await exec(`ocrmypdf --image-dpi 300 ${params.join(' ')} --skip-text --sidecar './uploads/${outputTxtFile}' './uploads/${imgFile}' './uploads/${outputFile}'`);
+				await exec(`ocrmypdf --image-dpi 300 ${params.join(' ')} --skip-text --output-type pdfa --sidecar './uploads/${outputTxtFile}' './uploads/${imgFile}' './uploads/${outputFile}'`);
 
 				res.status(200).json({ isSuccessful: true, file: outputFile })
 			}
