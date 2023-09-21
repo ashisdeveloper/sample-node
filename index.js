@@ -80,7 +80,7 @@ app.get("/ocr-pdf", async (req, res) => {
 		fs.mkdirSync("./uploads");
 	}
 	req.query.url = req.query.url || ''
-	let link = req.query.url.replace(/\s+/gi, '%20')
+	let link = req.query.url.replace(/\s/gi, '%20').replace(/\(/gi, '%28').replace(/\)/gi, '%29').replace(/"/gi, '%22').replace(/'/gi, '%27')
 	let params = []
 
 	if (Number(req.query?.rotate) === 1) params.push('--rotate-pages')
