@@ -152,7 +152,7 @@ app.get("/compress-pdf", async (req, res) => {
 			/* console.log('stdout:', stdout);
 			console.log('stderr:', stderr); */
 
-			await exec(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/${compressMode} -dNOPAUSE -dQUIET -dBATCH -sinputFile='./uploads/${outputFile}' './uploads/${inputFile}'`);
+			await exec(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/${compressMode} -dNOPAUSE -dQUIET -dBATCH -sOutputFile='./uploads/${outputFile}' './uploads/${inputFile}'`);
 
 			const inputFileSize = fs.statSync(`./uploads/${inputFile}`).size
 			const outputFileSize = fs.statSync(`./uploads/${outputFile}`).size
