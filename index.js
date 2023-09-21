@@ -129,3 +129,49 @@ app.get("/ocr-pdf", async (req, res) => {
 		res.status(200).json({ isSuccessful: false, file: '' })
 	}
 });
+
+app.get("/compress-pdf", async (req, res) => {
+	if (!fs.existsSync("./uploads")) {
+		fs.mkdirSync("./uploads");
+	}
+	let compressMode = req.query.mode || 'screen'
+	req.query.url = req.query.url || ''
+	let link = req.query.url.replace(/\s/gi, '%20').replace(/\(/gi, '%28').replace(/\)/gi, '%29').replace(/"/gi, '%22').replace(/'/gi, '%27')
+
+	let file = fileName(req.query.url)
+	const fileExtension = fileExt(file)
+
+	if (fileExtension == 'pdf' && file.includes('.')) {
+
+		console.log('LINK: ', link)
+
+		try {
+			const inputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
+			const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
+			const { stdout, stderr } = await exec(`wget -O ./uploads/${inputFile} ${link}`);
+			/* console.log('stdout:', stdout);
+			console.log('stderr:', stderr); */
+
+			await exec(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/${compressMode} -dNOPAUSE -dQUIET -dBATCH -sinputFile='./uploads/${outputFile}' './uploads/${inputFile}'`);
+
+			const inputFileSize = fs.statSync(`./uploads/${inputFile}`).size
+			const outputFileSize = fs.statSync(`./uploads/${outputFile}`).size
+
+			fs.unlinkSync(`./uploads/${inputFile}`)
+
+			res.status(200).json({
+				isSuccessful: true, file: {
+					name: outputFile,
+					originalSize: inputFileSize,
+					compressedSize: outputFileSize,
+				}
+			})
+		} catch (error) {
+			console.log(error)
+			res.status(200).json({ isSuccessful: false, file: {} })
+		}
+
+	} else {
+		res.status(200).json({ isSuccessful: false, file: {} })
+	}
+});
