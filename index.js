@@ -79,6 +79,7 @@ const fileExt = (url) => {
 const downloadFile = async (link, fileName) => {
 	let result = ''
 	try {
+		console.log(`wget -O ./uploads/${fileName} ${link}`)
 		const { stdout, stderr } = await exec(`wget -O ./uploads/${fileName} ${link}`);
 		console.log(stdout, stderr)
 	} catch (error) {
