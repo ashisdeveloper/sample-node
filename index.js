@@ -78,8 +78,8 @@ const fileExt = (url) => {
 
 const downloadFile = async (link, fileName) => {
 	let result = ''
+	console.log(`wget -O ./uploads/${fileName} ${link}`)
 	try {
-		console.log(`wget -O ./uploads/${fileName} ${link}`)
 		const { stdout, stderr } = await exec(`wget -O ./uploads/${fileName} ${link}`);
 		console.log(stdout, stderr)
 	} catch (error) {
@@ -117,9 +117,15 @@ app.get("/ocr-pdf", async (req, res) => {
 			if (fileExtension === 'pdf') {
 				const outputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
 
-				await exec(`ocrmypdf ${params.join(' ')} --skip-text --output-type pdfa --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
+				let isDownloaded = await downloadFile(link, outputFile)
+				if (isDownloaded === '') {
 
-				res.status(200).json({ isSuccessful: true, file: outputFile })
+					await exec(`ocrmypdf ${params.join(' ')} --skip-text --output-type pdfa --sidecar './uploads/${outputFile.replace(/\.pdf$/gi, '.txt')}' './uploads/${outputFile}' './uploads/${outputFile}'`);
+
+					res.status(200).json({ isSuccessful: true, file: outputFile })
+				} else {
+					res.status(200).json({ isSuccessful: false, file: '' })
+				}
 			} else {
 				const fileWithoutExt = `ocr-${new Date().getTime()}-${uuidv4()}`
 				let imgFile = `${fileWithoutExt}.${fileExtension}`
