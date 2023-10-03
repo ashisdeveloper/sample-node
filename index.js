@@ -6,7 +6,9 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const exec = util.promisify(require('child_process').exec);
 
-const PORT = 8021;
+const pdf2html = require('pdf2html');
+
+const PORT = 8022;
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -78,6 +80,7 @@ const downloadFile = async (link, fileName) => {
 	let result = ''
 	try {
 		const { stdout, stderr } = await exec(`wget -O ./uploads/${fileName} ${link}`);
+		console.log(stdout, stderr)
 	} catch (error) {
 		console.log(String(error))
 		if (String(error).includes('ERROR 404'))
@@ -123,7 +126,7 @@ app.get("/ocr-pdf", async (req, res) => {
 				const outputTxtFile = `${fileWithoutExt}.txt`
 				let isDownloaded = await downloadFile(link, imgFile)
 				if (isDownloaded === '') {
-					if (fileExtension === 'png') sharp(`./uploads/${imgFile}`).flatten({ background: '#fff' })
+					// if (fileExtension === 'png') sharp(`./uploads/${imgFile}`).flatten({ background: '#fff' })
 
 					await exec(`ocrmypdf --image-dpi 300 ${params.join(' ')} --skip-text --output-type pdfa --sidecar './uploads/${outputTxtFile}' './uploads/${imgFile}' './uploads/${outputFile}'`);
 
@@ -192,6 +195,10 @@ app.get("/compress-pdf", async (req, res) => {
 });
 
 app.get("/", async (req, res) => {
-	await downloadFile('http://10.39.1.65:8005/dms/Ashis/attendance_f412.gif', 'attendance_f4.gif')
-	res.send('WELCOME')
+
+	const html = await pdf2html.html('./uploads/test-ocr.pdf');
+	// console.log(html);
+	// res.send('WELCOME')
+	res.set('Content-Type', 'text/html');
+	res.send(Buffer.from(html));
 })
