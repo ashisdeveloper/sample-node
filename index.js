@@ -81,7 +81,7 @@ const downloadFile = async (link, fileName) => {
 	console.log(`wget -O ./uploads/${fileName} ${link}`)
 	try {
 		const { stdout, stderr } = await exec(`wget -O ./uploads/${fileName} ${link}`);
-		console.log(stdout, stderr)
+		// console.log(stdout, stderr)
 	} catch (error) {
 		console.log(String(error))
 		if (String(error).includes('ERROR 404'))
@@ -163,9 +163,9 @@ app.get("/compress-pdf", async (req, res) => {
 	let file = fileName(req.query.url)
 	const fileExtension = fileExt(file)
 
+	console.log('LINK: ', link)
 	if (fileExtension == 'pdf' && file.includes('.')) {
 
-		console.log('LINK: ', link)
 
 		try {
 			const inputFile = `ocr-${new Date().getTime()}-${uuidv4()}.pdf`
